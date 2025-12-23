@@ -1,0 +1,32 @@
+{
+  "name": "@sysmoon/sdk-js",
+  "version": "1.0.0",
+  "description": "JavaScript SDK for Sysmoon monitoring system",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "lint": "eslint src"
+  },
+  "dependencies": {
+    "socket.io-client": "^4.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.6",
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.3",
+    "eslint": "^8.56.0"
+  },
+  "keywords": ["monitoring", "real-time", "events", "sdk"],
+  "author": "Sysmoon",
+  "license": "MIT"
+}
