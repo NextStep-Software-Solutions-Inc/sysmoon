@@ -8,7 +8,7 @@
  * - System registration
  * - Various event types (orders, payments, errors)
  * - Different severity levels
- * - Real-time event streaming
+ * - Event sending to backend
  * - Continuous monitoring
  */
 
@@ -63,14 +63,6 @@ async function initializeMonitoring() {
     });
     
     console.log('✅ Startup event sent\n');
-    
-    // Connect to real-time monitoring (optional)
-    console.log('🔌 Connecting to real-time monitoring...');
-    sysmoon.connectRealTime({
-      onConnect: () => console.log('✅ Connected to real-time stream\n'),
-      onDisconnect: () => console.log('⚠️  Disconnected from real-time stream'),
-      onError: (error) => console.error('❌ Real-time error:', error.message),
-    });
     
   } catch (error) {
     console.error('❌ Failed to initialize monitoring:', error.message);
@@ -299,8 +291,6 @@ process.on('SIGINT', async () => {
       },
       severity: 'info',
     });
-    
-    sysmoon.disconnect();
   } catch (error) {
     // Ignore errors during shutdown
   }

@@ -11,7 +11,7 @@ A simulated e-commerce application built with Express.js that demonstrates the J
 
 **Features**:
 - RESTful API with order and payment processing
-- Real-time event streaming via WebSocket
+- Event sending via HTTP/REST to backend
 - Various event types and severity levels
 - Background activity simulation
 - Comprehensive error handling
@@ -38,7 +38,7 @@ A simulated system monitoring service built with .NET 8 that demonstrates the C#
 **Features**:
 - Continuous system metrics collection (CPU, Memory, Disk, Network)
 - Batch event sending for efficiency
-- Real-time streaming with SignalR
+- Event sending via HTTP/REST to backend
 - Dynamic severity based on thresholds
 - Anomaly detection simulation
 
@@ -127,14 +127,14 @@ pnpm install
 │ • E-Commerce (Node.js)  │ ──┐
 │ • Monitoring (C#)       │ ──┤
 └─────────────────────────┘   │
-                              │ SDK Integration
+                              │ Event Sending (HTTP/REST)
                               │
                               ↓
                     ┌──────────────────┐
                     │  Sysmoon SDKs    │
                     ├──────────────────┤
-                    │ • JS SDK (WS)    │
-                    │ • C# SDK (SignalR│
+                    │ • JS SDK         │
+                    │ • C# SDK         │
                     └──────────────────┘
                               │
                               ↓
@@ -143,13 +143,15 @@ pnpm install
                     ├──────────────────┤
                     │ • API Gateway    │
                     │ • Event Processor│
-                    │ • Real-time Broker
+                    │ • Real-time Broker (WS/SignalR)
                     │ • PostgreSQL DB  │
                     └──────────────────┘
                               │
                               ↓
                     ┌──────────────────┐
                     │ Dashboard UI     │
+                    │ (receives events │
+                    │  via WebSocket)  │
                     └──────────────────┘
 ```
 
@@ -160,14 +162,13 @@ Use these demos to verify:
 - [ ] System registration works
 - [ ] Event ingestion (single events)
 - [ ] Event ingestion (batch events)
-- [ ] Real-time WebSocket streaming
-- [ ] Real-time SignalR streaming
+- [ ] Dashboard receives events via WebSocket
+- [ ] Dashboard receives events via SignalR
 - [ ] Event filtering in dashboard
 - [ ] Severity-based color coding
 - [ ] Historical event queries
 - [ ] Multiple simultaneous systems
 - [ ] Graceful error handling
-- [ ] Connection retry logic
 - [ ] Shutdown cleanup
 
 ## Customization
@@ -196,7 +197,7 @@ Adjust the threshold logic to create more nuanced severity classification.
 **Events not appearing:**
 - Check registration success in demo console
 - Verify API key is stored
-- Check browser console for WebSocket errors
+- Check dashboard WebSocket connection status in browser console
 - Ensure database is running
 
 **High CPU usage:**

@@ -14,7 +14,7 @@ This demo app simulates a real e-commerce platform and showcases:
   - `health.check` - Health monitoring
   - `user.browsing` / `inventory.check` / `cache.hit` - Background activities
 - **Severity Levels**: info, warning, error, critical
-- **Real-time Monitoring**: Connects to WebSocket for live event streaming
+- **Event Sending**: Sends events to backend via HTTP/REST
 - **Background Activity**: Simulates continuous application activity
 
 ## Prerequisites
@@ -126,7 +126,7 @@ Once the app is running:
 2. **Registration Flow**: Automatic system registration on startup
 3. **Event Tracking**: Comprehensive event tracking across the application
 4. **Error Handling**: Proper error event logging with severity levels
-5. **Real-time Monitoring**: WebSocket connection for live updates
+5. **Event Sending**: HTTP/REST API for sending events to backend
 6. **Continuous Activity**: Background events simulating real-world usage
 7. **Graceful Shutdown**: Proper cleanup and shutdown event logging
 
@@ -136,13 +136,14 @@ Once the app is running:
 Demo App (Express)
        |
        ├── Sysmoon SDK (@sysmoon/sdk-js)
-       |     ├── HTTP Client (registration, events)
-       |     └── WebSocket Client (real-time)
+       |     └── HTTP Client (registration, event sending)
        |
        └── Sysmoon Backend
              ├── API (registration, event ingestion)
              ├── Database (PostgreSQL)
              └── Real-time Broker (Socket.IO)
+                   |
+                   └── Dashboard UI (receives events via WebSocket)
 ```
 
 ## Troubleshooting
@@ -154,7 +155,7 @@ Demo App (Express)
 **Events Not Appearing in Dashboard:**
 - Check that the system is registered (look for success message in console)
 - Verify the API key is being used (stored automatically after registration)
-- Check the browser console in the dashboard for WebSocket connection status
+- Refresh the dashboard or check that it's connected to the backend WebSocket
 
 **App Crashes on Startup:**
 - Ensure Node.js 20+ is installed: `node --version`

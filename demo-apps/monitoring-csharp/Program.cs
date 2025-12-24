@@ -9,7 +9,6 @@
  * - Continuous system metrics monitoring
  * - Various event types (CPU, memory, disk, network)
  * - Different severity levels based on thresholds
- * - Real-time event streaming with SignalR
  * - Batch event sending
  */
 
@@ -41,9 +40,6 @@ class Program
 
             // Register the monitoring service
             await RegisterService();
-
-            // Connect to real-time streaming
-            await ConnectRealTime();
 
             // Send startup event
             await SendStartupEvent();
@@ -81,25 +77,6 @@ class Program
         Console.WriteLine($"   System ID: {registration.SystemId}");
         Console.WriteLine($"   API Key: {registration.ApiKey}");
         Console.WriteLine("   Note: API key is stored for this session\n");
-    }
-
-    static async Task ConnectRealTime()
-    {
-        Console.WriteLine("🔌 Connecting to real-time stream (SignalR)...");
-
-        await _client!.ConnectRealTimeAsync();
-
-        // Subscribe to events (optional - for receiving events)
-        await _client.SubscribeAsync(
-            (eventData) =>
-            {
-                // Handle incoming events if needed
-                Console.WriteLine($"📨 Received event: {eventData.EventType}");
-            },
-            eventType: "monitoring.*"
-        );
-
-        Console.WriteLine("✅ Connected to real-time stream\n");
     }
 
     static async Task SendStartupEvent()
@@ -298,7 +275,6 @@ class Program
                 Severity = "info"
             });
 
-            _client.Dispose();
             Console.WriteLine("✅ Cleanup complete");
         }
         catch (Exception ex)

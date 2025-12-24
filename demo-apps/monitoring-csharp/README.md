@@ -19,7 +19,7 @@ This demo app simulates a real system monitoring service and showcases:
   - `warning` - CPU > 80%, Memory > 75%, Disk > 80%
   - `error` - Memory > 85%
   - `critical` - Disk > 90%
-- **Real-time Streaming**: Uses SignalR for bidirectional communication
+- **Event Sending**: Sends events to backend via HTTP/REST
 - **Batch Event Sending**: Sends multiple metrics in a single batch
 - **Continuous Monitoring**: Collects metrics every 5 seconds
 - **Anomaly Detection**: Randomly simulates anomaly events
@@ -104,7 +104,7 @@ The service automatically adjusts event severity based on simulated metrics:
 ## What This Demonstrates
 
 1. **C# SDK Integration**: How to integrate Sysmoon SDK in a .NET application
-2. **SignalR Streaming**: Real-time bidirectional communication
+2. **Event Sending**: HTTP/REST API for sending events to backend
 3. **Batch Operations**: Sending multiple events efficiently in a single request
 4. **Continuous Monitoring**: Long-running service with periodic metrics collection
 5. **Dynamic Severity**: Events with severity based on actual metrics
@@ -117,13 +117,14 @@ The service automatically adjusts event severity based on simulated metrics:
 Demo Monitoring Service (.NET 8)
        |
        ├── Sysmoon SDK (Sysmoon.SDK)
-       |     ├── HTTP Client (registration, events)
-       |     └── SignalR Client (real-time)
+       |     └── HTTP Client (registration, event sending)
        |
        └── Sysmoon Backend
              ├── API (registration, event ingestion)
              ├── Database (PostgreSQL)
              └── Real-time Broker (SignalR Hub)
+                   |
+                   └── Dashboard UI (receives events via SignalR)
 ```
 
 ## Sample Output
@@ -136,9 +137,6 @@ Demo Monitoring Service (.NET 8)
    System ID: 550e8400-e29b-41d4-a716-446655440000
    API Key: ********-****-****-****-************
    Note: API key is stored for this session
-
-🔌 Connecting to real-time stream (SignalR)...
-✅ Connected to real-time stream
 
 ✅ Startup event sent
 
@@ -167,10 +165,5 @@ Demo Monitoring Service (.NET 8)
 
 **Events Not Appearing:**
 - Check that the service registered successfully (look for success message)
-- Verify the SignalR connection is established
-- Check the browser console in the dashboard for any errors
-
-**SignalR Connection Issues:**
-- Ensure the backend server.ts is running with SignalR support
-- Check firewall settings if running across networks
-- Verify CORS configuration if accessing from different origin
+- Verify the events are being sent (check console output)
+- Refresh the dashboard or check that it's connected to the backend
