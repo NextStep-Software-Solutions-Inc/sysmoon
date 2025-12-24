@@ -1,0 +1,405 @@
+# Sysmoon
+
+**Platform-agnostic real-time monitoring system**
+
+Sysmoon is an extensible monitoring platform that enables real-time monitoring of registered systems (apps/services) with multi-protocol support for real-time delivery (WebSocket, SignalR, SSE), pluggable SDKs (JavaScript & C#), and a fully customizable dashboard UI.
+
+## 🌟 Features
+
+- **Real-time Event Monitoring**: Stream events from your applications in real-time
+- **Multi-Protocol Support**: WebSocket, SignalR, SSE, and HTTP/REST
+- **Lightweight SDKs**: Easy-to-use JavaScript/TypeScript and C# SDKs
+- **Customizable Dashboard**: Next.js-based UI with filtering and real-time updates
+- **Event Filtering**: Filter events by system, type, and severity
+- **Batch Event Processing**: Send multiple events efficiently
+- **PostgreSQL Storage**: Persistent event storage with full query capabilities
+- **API Key Authentication**: Secure system registration and event ingestion
+
+## 🏗️ Architecture
+
+```
+┌─────────────────────┐   HTTP/WS/SSE/SignalR   ┌────────────────────┐
+│ Monitored System    │------------------------>│ API Gateway +      │
+│      (SDK)          │   Emit Events, Auth     │ Real-Time Broker   │
+└─────────────────────┘                         └────────────────────┘
+                                                         |
+                                                  [Enrichment, Filter]
+                                                         |
+                                                 ┌────────────────────┐
+                                                 │   PostgreSQL DB    │
+                                                 │ (Events, Systems)  │
+                                                 └────────────────────┘
+                                                         ^
+                                                         |
+                                                 ┌──────────────────┐
+                                                 │  Dashboard UI    │
+                                                 │ (Next.js Client) │
+                                                 └──────────────────┘
+```
+
+## 📁 Repository Structure
+
+```
+sysmoon/
+├── apps/
+│   ├── dashboard/          # Next.js dashboard UI
+│   └── server-api/         # Next.js backend with API routes
+├── packages/
+│   └── database/           # Prisma schema and database client
+├── sdks/
+│   ├── js/                 # JavaScript/TypeScript SDK
+│   └── csharp/             # C#/.NET SDK
+└── README.md
+```
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Node.js 18+ and pnpm 8+
+- PostgreSQL 14+
+- .NET 8.0+ (for C# SDK development)
+
+### Installation
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/NextStep-Software-Solutions-Inc/sysmoon.git
+   cd sysmoon
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   pnpm install
+   ```
+
+3. **Set up environment variables:**
+   
+   Create `packages/database/.env`:
+   ```bash
+   DATABASE_URL="postgresql://user:password@localhost:5432/sysmoon"
+   ```
+   
+   Create `apps/server-api/.env.local`:
+   ```bash
+   DATABASE_URL="postgresql://user:password@localhost:5432/sysmoon"
+   PORT=3001
+   NEXT_PUBLIC_DASHBOARD_URL="http://localhost:3000"
+   ```
+   
+   Create `apps/dashboard/.env.local`:
+   ```bash
+   NEXT_PUBLIC_API_URL="http://localhost:3001"
+   ```
+
+4. **Initialize the database:**
+   ```bash
+   pnpm db:generate
+   pnpm db:migrate
+   ```
+
+5. **Start development servers:**
+   ```bash
+   pnpm dev
+   ```
+
+   This will start:
+   - Dashboard: http://localhost:3000
+   - API Server: http://localhost:3001
+
+## 📚 Usage
+
+### 1. Register a System
+
+Use the dashboard or API directly:
+
+```bash
+curl -X POST http://localhost:3001/api/register \
+  -H "Content-Type: application/json" \
+  -d '{"name":"My App","description":"Production server"}'
+```
+
+Response:
+```json
+{
+  "success": true,
+  "data": {
+    "systemId": "uuid",
+    "apiKey": "uuid",
+    "name": "My App"
+  }
+}
+```
+
+**Save the API key securely!**
+
+### 2. Send Events with JavaScript SDK
+
+```bash
+npm install @sysmoon/sdk-js
+```
+
+```javascript
+import SysmoonClient from '@sysmoon/sdk-js';
+
+const client = new SysmoonClient({
+  apiUrl: 'http://localhost:3001',
+  apiKey: 'your-api-key-here'
+});
+
+// Send single event
+await client.sendEvent({
+  eventType: 'user.login',
+  payload: { userId: '123', ip: '192.168.1.1' },
+  severity: 'info'
+});
+
+// Send batch events
+await client.sendEvents([
+  { eventType: 'user.login', payload: { userId: '123' } },
+  { eventType: 'user.logout', payload: { userId: '123' } }
+]);
+
+// Real-time streaming
+client.connectRealTime({
+  onConnect: () => console.log('Connected'),
+});
+
+client.subscribe({ eventType: 'user.login' }, (event) => {
+  console.log('New event:', event);
+});
+```
+
+### 3. Send Events with C# SDK
+
+```bash
+dotnet add package Sysmoon.SDK
+```
+
+```csharp
+using Sysmoon.SDK;
+
+var client = new SysmoonClient(new SysmoonConfig
+{
+    ApiUrl = "http://localhost:3001",
+    ApiKey = "your-api-key-here"
+});
+
+// Send single event
+await client.SendEventAsync(new EventData
+{
+    EventType = "user.login",
+    Payload = new { UserId = "123", Ip = "192.168.1.1" },
+    Severity = "info"
+});
+
+// Real-time streaming
+await client.ConnectRealTimeAsync();
+await client.SubscribeAsync(
+    callback: (evt) => Console.WriteLine($"Event: {evt}"),
+    eventType: "user.login"
+);
+```
+
+### 4. View Events in Dashboard
+
+1. Open http://localhost:3000
+2. See registered systems and real-time events
+3. Click on a system to filter events
+4. Events appear instantly as they're received
+
+## 🔌 API Endpoints
+
+### POST `/api/register`
+Register a new monitored system
+
+**Request:**
+```json
+{
+  "name": "My Application",
+  "description": "Optional description"
+}
+```
+
+### POST `/api/events`
+Ingest events (requires `X-API-Key` header)
+
+**Single Event:**
+```json
+{
+  "eventType": "user.login",
+  "payload": { "userId": "123" },
+  "severity": "info"
+}
+```
+
+**Batch Events:**
+```json
+[
+  { "eventType": "event1", "payload": {...} },
+  { "eventType": "event2", "payload": {...} }
+]
+```
+
+### GET `/api/systems`
+List all registered systems
+
+### GET `/api/events/query`
+Query historical events
+
+**Parameters:**
+- `systemId` - Filter by system
+- `eventType` - Filter by event type
+- `severity` - Filter by severity (comma-separated)
+- `limit` - Results per page (default: 100)
+- `offset` - Pagination offset
+
+### WebSocket `/api/socket`
+Real-time event streaming
+
+```javascript
+socket.emit('subscribe', {
+  systemId: 'optional',
+  eventType: 'optional',
+  severity: ['error', 'critical']
+});
+
+socket.on('event', (event) => {
+  console.log('New event:', event);
+});
+```
+
+## 🔒 Security
+
+- All event endpoints require API key authentication
+- API keys are generated during system registration
+- Store API keys securely (environment variables, secrets manager)
+- CORS configuration for dashboard access
+- Role-based access control (future enhancement)
+
+## 🛠️ Development
+
+### Project Commands
+
+```bash
+# Install dependencies
+pnpm install
+
+# Development mode (all apps)
+pnpm dev
+
+# Build all packages
+pnpm build
+
+# Run linting
+pnpm lint
+
+# Database operations
+pnpm db:generate  # Generate Prisma client
+pnpm db:migrate   # Run migrations
+pnpm db:studio    # Open Prisma Studio
+```
+
+### Package-specific Commands
+
+```bash
+# Server API
+cd apps/server-api
+pnpm dev          # Start on port 3001
+
+# Dashboard
+cd apps/dashboard
+pnpm dev          # Start on port 3000
+
+# JS SDK
+cd sdks/js
+pnpm build        # Build SDK
+
+# C# SDK
+cd sdks/csharp
+dotnet build      # Build SDK
+```
+
+## 📖 Documentation
+
+Detailed documentation for each component:
+
+- [Server API Documentation](./apps/server-api/README.md)
+- [Dashboard Documentation](./apps/dashboard/README.md)
+- [JavaScript SDK Documentation](./sdks/js/README.md)
+- [C# SDK Documentation](./sdks/csharp/README.md)
+- [Database Schema Documentation](./packages/database/README.md)
+
+## 🚢 Deployment
+
+### Docker Compose (Coming Soon)
+
+```yaml
+version: '3.8'
+services:
+  postgres:
+    image: postgres:14
+    environment:
+      POSTGRES_DB: sysmoon
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    
+  api:
+    build: ./apps/server-api
+    environment:
+      DATABASE_URL: postgresql://user:password@postgres:5432/sysmoon
+    ports:
+      - "3001:3001"
+    
+  dashboard:
+    build: ./apps/dashboard
+    environment:
+      NEXT_PUBLIC_API_URL: http://api:3001
+    ports:
+      - "3000:3000"
+```
+
+### Environment-specific Configuration
+
+All services are configurable via environment variables for easy deployment to:
+- Cloud platforms (AWS, Azure, GCP)
+- On-premises infrastructure
+- Hybrid environments
+
+## 🤝 Contributing
+
+Contributions are welcome! Please read our contributing guidelines.
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
+
+## 📝 License
+
+MIT License - see LICENSE file for details
+
+## 🎯 Roadmap
+
+- [ ] Server-Sent Events (SSE) implementation
+- [ ] Enhanced dashboard with drag-and-drop widgets
+- [ ] Dashboard layout persistence
+- [ ] Alert and notification system
+- [ ] Python SDK
+- [ ] Go SDK
+- [ ] Advanced analytics and reporting
+- [ ] Multi-tenancy support
+- [ ] Webhook integrations
+- [ ] Docker Compose setup
+- [ ] Kubernetes deployment guides
+
+## 💬 Support
+
+For questions, issues, or feature requests:
+- Open an issue on GitHub
+- Check existing documentation
+- Review API examples in SDK documentation
+
+---
+
+Built with ❤️ by NextStep Software Solutions Inc.

@@ -1,4 +1,4 @@
-# Sysmoon
+# Sysmoon (Unified Next.js App - App Router)
 
 **Platform-agnostic real-time monitoring system**
 
@@ -14,41 +14,55 @@ Sysmoon is an extensible monitoring platform that enables real-time monitoring o
 - **Batch Event Processing**: Send multiple events efficiently
 - **PostgreSQL Storage**: Persistent event storage with full query capabilities
 - **API Key Authentication**: Secure system registration and event ingestion
+- **Unified Architecture**: Single Next.js app with App Router for simplified deployment
 
 ## 🏗️ Architecture
 
 ```
-┌─────────────────────┐   HTTP/WS/SSE/SignalR   ┌────────────────────┐
-│ Monitored System    │------------------------>│ API Gateway +      │
-│      (SDK)          │   Emit Events, Auth     │ Real-Time Broker   │
-└─────────────────────┘                         └────────────────────┘
-                                                         |
-                                                  [Enrichment, Filter]
-                                                         |
-                                                 ┌────────────────────┐
-                                                 │   PostgreSQL DB    │
-                                                 │ (Events, Systems)  │
+┌─────────────────────┐   HTTP/WS/SignalR      ┌────────────────────┐
+│ Monitored System    │------------------------>│  Unified Next.js   │
+│      (SDK)          │   Emit Events, Auth     │  App (App Router)  │
+└─────────────────────┘                         │                    │
+                                                 │  • API Routes      │
+                                                 │  • Dashboard UI    │
+                                                 │  • WebSocket       │
                                                  └────────────────────┘
-                                                         ^
-                                                         |
-                                                 ┌──────────────────┐
-                                                 │  Dashboard UI    │
-                                                 │ (Next.js Client) │
-                                                 └──────────────────┘
+                                                          |
+                                                   [Event Processor]
+                                                          |
+                                                  ┌────────────────────┐
+                                                  │   PostgreSQL DB    │
+                                                  │ (Events, Systems)  │
+                                                  └────────────────────┘
 ```
 
 ## 📁 Repository Structure
 
 ```
 sysmoon/
-├── apps/
-│   ├── dashboard/          # Next.js dashboard UI
-│   └── server-api/         # Next.js backend with API routes
+├── app/                    # Next.js App Router
+│   ├── api/                # API route handlers
+│   │   ├── register/       # System registration
+│   │   ├── events/         # Event ingestion & query
+│   │   └── systems/        # Systems list
+│   ├── dashboard/          # Dashboard UI
+│   ├── layout.tsx          # Root layout
+│   └── page.tsx            # Landing page
+├── components/             # Shared UI components
+├── lib/                    # Shared utilities and services
+│   ├── services/           # Event processor, etc.
+│   ├── hooks/              # React hooks
+│   ├── api.ts              # API client functions
+│   ├── auth.ts             # Authentication utilities
+│   └── prisma.ts           # Database client
 ├── packages/
-│   └── database/           # Prisma schema and database client
+│   └── database/           # Prisma schema
 ├── sdks/
 │   ├── js/                 # JavaScript/TypeScript SDK
 │   └── csharp/             # C#/.NET SDK
+├── public/                 # Static assets
+├── server.ts               # Custom server with WebSocket
+├── next.config.js          # Next.js configuration
 └── README.md
 ```
 
@@ -75,21 +89,27 @@ sysmoon/
 
 3. **Set up environment variables:**
    
-   Create `packages/database/.env`:
+   Copy the example file:
    ```bash
-   DATABASE_URL="postgresql://user:password@localhost:5432/sysmoon"
+   cp .env.example .env.local
    ```
    
-   Create `apps/server-api/.env.local`:
+   Edit `.env.local`:
    ```bash
    DATABASE_URL="postgresql://user:password@localhost:5432/sysmoon"
-   PORT=3001
-   NEXT_PUBLIC_DASHBOARD_URL="http://localhost:3000"
+   PORT=3000
+   NODE_ENV=development
+   NEXT_PUBLIC_API_URL="http://localhost:3000"
    ```
    
-   Create `apps/dashboard/.env.local`:
+   Also set up the database package:
    ```bash
-   NEXT_PUBLIC_API_URL="http://localhost:3001"
+   cp packages/database/.env.example packages/database/.env
+   ```
+   
+   Edit `packages/database/.env`:
+   ```bash
+   DATABASE_URL="postgresql://user:password@localhost:5432/sysmoon"
    ```
 
 4. **Initialize the database:**
@@ -98,23 +118,24 @@ sysmoon/
    pnpm db:migrate
    ```
 
-5. **Start development servers:**
+5. **Start the development server:**
    ```bash
    pnpm dev
    ```
 
    This will start:
-   - Dashboard: http://localhost:3000
-   - API Server: http://localhost:3001
+   - Dashboard: http://localhost:3000/dashboard
+   - API: http://localhost:3000/api/*
+   - WebSocket: ws://localhost:3000/api/socket
 
 ## 📚 Usage
 
 ### 1. Register a System
 
-Use the dashboard or API directly:
+Use the dashboard at http://localhost:3000/dashboard or API directly:
 
 ```bash
-curl -X POST http://localhost:3001/api/register \
+curl -X POST http://localhost:3000/api/register \
   -H "Content-Type: application/json" \
   -d '{"name":"My App","description":"Production server"}'
 ```
@@ -143,7 +164,7 @@ npm install @sysmoon/sdk-js
 import SysmoonClient from '@sysmoon/sdk-js';
 
 const client = new SysmoonClient({
-  apiUrl: 'http://localhost:3001',
+  apiUrl: 'http://localhost:3000',
   apiKey: 'your-api-key-here'
 });
 
@@ -153,12 +174,6 @@ await client.sendEvent({
   payload: { userId: '123', ip: '192.168.1.1' },
   severity: 'info'
 });
-
-// Send batch events
-await client.sendEvents([
-  { eventType: 'user.login', payload: { userId: '123' } },
-  { eventType: 'user.logout', payload: { userId: '123' } }
-]);
 
 // Real-time streaming
 client.connectRealTime({
@@ -181,7 +196,7 @@ using Sysmoon.SDK;
 
 var client = new SysmoonClient(new SysmoonConfig
 {
-    ApiUrl = "http://localhost:3001",
+    ApiUrl = "http://localhost:3000",
     ApiKey = "your-api-key-here"
 });
 
@@ -201,45 +216,15 @@ await client.SubscribeAsync(
 );
 ```
 
-### 4. View Events in Dashboard
-
-1. Open http://localhost:3000
-2. See registered systems and real-time events
-3. Click on a system to filter events
-4. Events appear instantly as they're received
-
 ## 🔌 API Endpoints
+
+All endpoints are served from the single Next.js app:
 
 ### POST `/api/register`
 Register a new monitored system
 
-**Request:**
-```json
-{
-  "name": "My Application",
-  "description": "Optional description"
-}
-```
-
 ### POST `/api/events`
 Ingest events (requires `X-API-Key` header)
-
-**Single Event:**
-```json
-{
-  "eventType": "user.login",
-  "payload": { "userId": "123" },
-  "severity": "info"
-}
-```
-
-**Batch Events:**
-```json
-[
-  { "eventType": "event1", "payload": {...} },
-  { "eventType": "event2", "payload": {...} }
-]
-```
 
 ### GET `/api/systems`
 List all registered systems
@@ -275,7 +260,6 @@ socket.on('event', (event) => {
 - API keys are generated during system registration
 - Store API keys securely (environment variables, secrets manager)
 - CORS configuration for dashboard access
-- Role-based access control (future enhancement)
 
 ## 🛠️ Development
 
@@ -285,11 +269,14 @@ socket.on('event', (event) => {
 # Install dependencies
 pnpm install
 
-# Development mode (all apps)
+# Development mode
 pnpm dev
 
-# Build all packages
+# Build for production
 pnpm build
+
+# Start production server
+pnpm start
 
 # Run linting
 pnpm lint
@@ -300,98 +287,76 @@ pnpm db:migrate   # Run migrations
 pnpm db:studio    # Open Prisma Studio
 ```
 
-### Package-specific Commands
+## 📖 Data Flow
 
-```bash
-# Server API
-cd apps/server-api
-pnpm dev          # Start on port 3001
+The unified architecture follows this pattern:
 
-# Dashboard
-cd apps/dashboard
-pnpm dev          # Start on port 3000
-
-# JS SDK
-cd sdks/js
-pnpm build        # Build SDK
-
-# C# SDK
-cd sdks/csharp
-dotnet build      # Build SDK
+```
+3rd Party System/SDK --(HTTP/WS)--> /app/api/*/route.ts (server)
+                                              |
+                                        Event Processor
+                                              |
+                                     +--------+--------+
+                                     |                 |
+                                PostgreSQL      WebSocket Broadcast
+                                     |                 |
+                                     v                 v
+                       Historical Query UI      Live Dashboard UI
+                         (/dashboard)            (/dashboard)
 ```
 
-## 📖 Documentation
-
-Detailed documentation for each component:
-
-- [Server API Documentation](./apps/server-api/README.md)
-- [Dashboard Documentation](./apps/dashboard/README.md)
-- [JavaScript SDK Documentation](./sdks/js/README.md)
-- [C# SDK Documentation](./sdks/csharp/README.md)
-- [Database Schema Documentation](./packages/database/README.md)
+Key principles:
+- UI routes in `/app` (dashboard, register, etc.)
+- API routes in `/app/api` (REST endpoints)
+- WebSocket managed by custom server (`server.ts`)
+- Shared code in `/lib` (services, utilities)
+- UI components in `/components`
 
 ## 🚢 Deployment
 
-### Docker Compose (Coming Soon)
+### Single Deployment
 
-```yaml
-version: '3.8'
-services:
-  postgres:
-    image: postgres:14
-    environment:
-      POSTGRES_DB: sysmoon
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-    
-  api:
-    build: ./apps/server-api
-    environment:
-      DATABASE_URL: postgresql://user:password@postgres:5432/sysmoon
-    ports:
-      - "3001:3001"
-    
-  dashboard:
-    build: ./apps/dashboard
-    environment:
-      NEXT_PUBLIC_API_URL: http://api:3001
-    ports:
-      - "3000:3000"
+The unified architecture allows deployment as a single Next.js application:
+
+**Vercel (Recommended):**
+```bash
+vercel deploy
 ```
 
-### Environment-specific Configuration
+**Docker:**
+```dockerfile
+FROM node:18-alpine
+WORKDIR /app
+COPY . .
+RUN npm install -g pnpm
+RUN pnpm install
+RUN pnpm build
+ENV NODE_ENV=production
+CMD ["pnpm", "start"]
+```
 
-All services are configurable via environment variables for easy deployment to:
-- Cloud platforms (AWS, Azure, GCP)
-- On-premises infrastructure
-- Hybrid environments
+**Environment Variables:**
+Set these in your deployment platform:
+- `DATABASE_URL`: PostgreSQL connection string
+- `PORT`: Server port (default: 3000)
+- `NODE_ENV`: production
+- `NEXT_PUBLIC_API_URL`: Your deployment URL
+
+## 📝 Migration from Separate Apps
+
+This version consolidates the previous monorepo structure (`apps/dashboard` + `apps/server-api`) into a single Next.js App Router application for:
+- **Simplified deployment**: One app to deploy instead of two
+- **Easier development**: Single dev server
+- **Better performance**: Reduced network overhead
+- **Unified codebase**: Shared utilities and components
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please read our contributing guidelines.
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for contribution guidelines.
 
 ## 📝 License
 
-MIT License - see LICENSE file for details
-
-## 🎯 Roadmap
-
-- [ ] Server-Sent Events (SSE) implementation
-- [ ] Enhanced dashboard with drag-and-drop widgets
-- [ ] Dashboard layout persistence
-- [ ] Alert and notification system
-- [ ] Python SDK
-- [ ] Go SDK
-- [ ] Advanced analytics and reporting
-- [ ] Multi-tenancy support
-- [ ] Webhook integrations
-- [ ] Docker Compose setup
-- [ ] Kubernetes deployment guides
+MIT License - see [LICENSE](./LICENSE) file for details.
 
 ## 💬 Support
 

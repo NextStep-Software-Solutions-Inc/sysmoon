@@ -59,3 +59,6 @@ obj/
 
 # Turbo
 .turbo/
+
+# Old apps (kept for reference during migration)
+apps/
