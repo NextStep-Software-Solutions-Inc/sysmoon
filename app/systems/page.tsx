@@ -7,11 +7,12 @@ interface System {
   id: string;
   name: string;
   description: string;
-  apiKey: string;
+  apiKey?: string;
   createdAt: string;
-  _count: {
+  _count?: {
     events: number;
   };
+  eventCount?: number;
 }
 
 export default function SystemsManagement() {
@@ -31,7 +32,7 @@ export default function SystemsManagement() {
       const response = await fetch('/api/systems');
       const data = await response.json();
       if (data.success) {
-        setSystems(data.data);
+        setSystems(data.data.systems || []);
       }
     } catch (error) {
       console.error('Failed to fetch systems:', error);
@@ -66,7 +67,8 @@ export default function SystemsManagement() {
     setTimeout(() => setCopiedKey(null), 2000);
   };
 
-  const maskApiKey = (key: string) => {
+  const maskApiKey = (key?: string) => {
+    if (!key) return 'Hidden for security';
     return key.substring(0, 8) + '•'.repeat(24) + key.substring(key.length - 4);
   };
 
@@ -213,21 +215,23 @@ export default function SystemsManagement() {
                       <code className="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded flex-1 truncate">
                         {maskApiKey(system.apiKey)}
                       </code>
-                      <button
-                        onClick={() => copyToClipboard(system.apiKey, system.id)}
-                        className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
-                        title="Copy API Key"
-                      >
-                        {copiedKey === system.id ? (
-                          <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          </svg>
-                        ) : (
-                          <svg className="w-4 h-4 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-                          </svg>
-                        )}
-                      </button>
+                      {system.apiKey && (
+                        <button
+                          onClick={() => copyToClipboard(system.apiKey!, system.id)}
+                          className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                          title="Copy API Key"
+                        >
+                          {copiedKey === system.id ? (
+                            <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                          ) : (
+                            <svg className="w-4 h-4 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                            </svg>
+                          )}
+                        </button>
+                      )}
                     </div>
                   </div>
 
@@ -235,7 +239,7 @@ export default function SystemsManagement() {
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-gray-600 dark:text-gray-400">Events</span>
                       <span className="font-semibold text-blue-600 dark:text-blue-400">
-                        {system._count.events.toLocaleString()}
+                        {(system._count?.events || system.eventCount || 0).toLocaleString()}
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-sm mt-2">

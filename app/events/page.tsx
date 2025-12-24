@@ -40,7 +40,7 @@ export default function EventsPage() {
       const response = await fetch('/api/systems');
       const data = await response.json();
       if (data.success) {
-        setSystems(data.data);
+        setSystems(data.data.systems || []);
       }
     } catch (error) {
       console.error('Failed to fetch systems:', error);
@@ -49,7 +49,7 @@ export default function EventsPage() {
 
   const filteredEvents = events.filter((event) => {
     const matchesSeverity = !selectedSeverity || event.severity === selectedSeverity;
-    const matchesSearch = !searchTerm || 
+    const matchesSearch = !searchTerm ||
       event.eventType.toLowerCase().includes(searchTerm.toLowerCase()) ||
       JSON.stringify(event.payload).toLowerCase().includes(searchTerm.toLowerCase());
     return matchesSeverity && matchesSearch;
@@ -169,11 +169,10 @@ export default function EventsPage() {
               </label>
               <button
                 onClick={() => setAutoScroll(!autoScroll)}
-                className={`w-full px-3 py-2 rounded-md transition-colors ${
-                  autoScroll
+                className={`w-full px-3 py-2 rounded-md transition-colors ${autoScroll
                     ? 'bg-purple-600 text-white hover:bg-purple-700'
                     : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-                }`}
+                  }`}
               >
                 {autoScroll ? 'Auto-Scroll: ON' : 'Auto-Scroll: OFF'}
               </button>
@@ -186,7 +185,7 @@ export default function EventsPage() {
           <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
             Event Timeline ({filteredEvents.length} events)
           </h2>
-          
+
           {filteredEvents.length === 0 ? (
             <div className="text-center py-12">
               <svg className="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
