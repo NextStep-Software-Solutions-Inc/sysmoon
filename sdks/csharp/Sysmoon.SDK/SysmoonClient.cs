@@ -12,42 +12,17 @@ public class SysmoonClient : IDisposable
 
     public SysmoonClient(SysmoonConfig config)
     {
+        if (string.IsNullOrEmpty(config.ApiKey))
+        {
+            throw new ArgumentException(
+                "API key is required. Please register a system in the Sysmoon dashboard at /systems and provide the generated API key.",
+                nameof(config.ApiKey)
+            );
+        }
+
         _config = config;
         _httpClient = new HttpClient { BaseAddress = new Uri(config.ApiUrl) };
-        
-        if (!string.IsNullOrEmpty(config.ApiKey))
-        {
-            _httpClient.DefaultRequestHeaders.Add("X-API-Key", config.ApiKey);
-        }
-    }
-
-    /// <summary>
-    /// Register a new system with Sysmoon
-    /// </summary>
-    public async Task<RegistrationResponse> RegisterAsync(string? name = null, string? description = null)
-    {
-        var requestData = new
-        {
-            name = name ?? _config.SystemName ?? "Unnamed System",
-            description = description ?? _config.SystemDescription
-        };
-
-        var response = await _httpClient.PostAsJsonAsync("/api/register", requestData);
-        response.EnsureSuccessStatusCode();
-
-        var result = await response.Content.ReadFromJsonAsync<ApiResponse<RegistrationResponse>>();
-        
-        if (result?.Success != true || result.Data == null)
-        {
-            throw new Exception(result?.Error ?? "Registration failed");
-        }
-
-        // Store API key for future requests
-        _config.ApiKey = result.Data.ApiKey;
-        _httpClient.DefaultRequestHeaders.Remove("X-API-Key");
-        _httpClient.DefaultRequestHeaders.Add("X-API-Key", result.Data.ApiKey);
-
-        return result.Data;
+        _httpClient.DefaultRequestHeaders.Add("X-API-Key", config.ApiKey);
     }
 
     /// <summary>
@@ -55,11 +30,6 @@ public class SysmoonClient : IDisposable
     /// </summary>
     public async Task SendEventAsync(EventData eventData)
     {
-        if (string.IsNullOrEmpty(_config.ApiKey))
-        {
-            throw new InvalidOperationException("API key not set. Please register first or provide an API key.");
-        }
-
         var response = await _httpClient.PostAsJsonAsync("/api/events", eventData);
         response.EnsureSuccessStatusCode();
 
@@ -76,11 +46,6 @@ public class SysmoonClient : IDisposable
     /// </summary>
     public async Task SendEventsAsync(IEnumerable<EventData> events)
     {
-        if (string.IsNullOrEmpty(_config.ApiKey))
-        {
-            throw new InvalidOperationException("API key not set. Please register first or provide an API key.");
-        }
-
         var response = await _httpClient.PostAsJsonAsync("/api/events", events);
         response.EnsureSuccessStatusCode();
 
@@ -146,16 +111,6 @@ public class SysmoonClient : IDisposable
             await _hubConnection.DisposeAsync();
             _hubConnection = null;
         }
-    }
-
-    /// <summary>
-    /// Set API key manually
-    /// </summary>
-    public void SetApiKey(string apiKey)
-    {
-        _config.ApiKey = apiKey;
-        _httpClient.DefaultRequestHeaders.Remove("X-API-Key");
-        _httpClient.DefaultRequestHeaders.Add("X-API-Key", apiKey);
     }
 
     public void Dispose()

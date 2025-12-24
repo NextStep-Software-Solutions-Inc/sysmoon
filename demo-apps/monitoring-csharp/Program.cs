@@ -29,17 +29,37 @@ class Program
 
         // Configuration
         var apiUrl = Environment.GetEnvironmentVariable("SYSMOON_API_URL") ?? "http://localhost:3000";
+        var apiKey = Environment.GetEnvironmentVariable("SYSMOON_API_KEY");
+
+        // Validate required environment variables
+        if (string.IsNullOrEmpty(apiKey))
+        {
+            Console.WriteLine("❌ Error: SYSMOON_API_KEY environment variable is required");
+            Console.WriteLine("");
+            Console.WriteLine("Please register your system in the Sysmoon dashboard:");
+            Console.WriteLine($"  1. Navigate to {apiUrl}/systems");
+            Console.WriteLine("  2. Click \"Register New System\"");
+            Console.WriteLine("  3. Copy the generated API key");
+            Console.WriteLine("  4. Set the environment variable:");
+            Console.WriteLine("     $env:SYSMOON_API_KEY=\"your-api-key-here\"  (PowerShell)");
+            Console.WriteLine("     set SYSMOON_API_KEY=your-api-key-here      (CMD)");
+            Console.WriteLine("     export SYSMOON_API_KEY=\"your-api-key-here\" (Bash)");
+            Console.WriteLine("");
+            Environment.Exit(1);
+        }
 
         try
         {
-            // Initialize Sysmoon client
+            // Initialize Sysmoon client with API key
             _client = new SysmoonClient(new SysmoonConfig
             {
-                ApiUrl = apiUrl
+                ApiUrl = apiUrl,
+                ApiKey = apiKey
             });
 
-            // Register the monitoring service
-            await RegisterService();
+            Console.WriteLine($"📊 Connected to Sysmoon at {apiUrl}");
+            Console.WriteLine($"🔑 Using API Key: {apiKey.Substring(0, Math.Min(8, apiKey.Length))}...");
+            Console.WriteLine("");
 
             // Send startup event
             await SendStartupEvent();
@@ -60,23 +80,9 @@ class Program
         catch (Exception ex)
         {
             Console.WriteLine($"❌ Error: {ex.Message}");
+            Console.WriteLine("   Please check your API key and Sysmoon server status");
             Environment.Exit(1);
         }
-    }
-
-    static async Task RegisterService()
-    {
-        Console.WriteLine("📝 Registering with Sysmoon...");
-
-        var registration = await _client!.RegisterAsync(
-            "Demo System Monitoring Service",
-            "A C# monitoring service that tracks system metrics and performance"
-        );
-
-        Console.WriteLine("✅ Registration successful!");
-        Console.WriteLine($"   System ID: {registration.SystemId}");
-        Console.WriteLine($"   API Key: {registration.ApiKey}");
-        Console.WriteLine("   Note: API key is stored for this session\n");
     }
 
     static async Task SendStartupEvent()
@@ -96,7 +102,7 @@ class Program
             Severity = "info"
         });
 
-        Console.WriteLine("✅ Startup event sent\n");
+        Console.WriteLine("✅ Startup event sent successfully\n");
     }
 
     static async Task RunMonitoringLoop()
