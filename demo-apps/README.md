@@ -118,7 +118,7 @@ pnpm install
 - `monitoring.cpu` / `monitoring.memory` / `monitoring.disk` / `monitoring.network` - Metrics
 - `monitoring.anomaly.*` - Anomaly detection
 
-## Architecture
+## Architecture & Authentication Flow
 
 ```
 ┌─────────────────────────┐
@@ -127,33 +127,48 @@ pnpm install
 │ • E-Commerce (Node.js)  │ ──┐
 │ • Monitoring (C#)       │ ──┤
 └─────────────────────────┘   │
-                              │ Event Sending (HTTP/REST)
                               │
+    1. POST /api/register     │ Event Sending (HTTP/REST)
+       (no auth)              │ + X-API-Key header
+    ← {systemId, apiKey}      │
                               ↓
                     ┌──────────────────┐
                     │  Sysmoon SDKs    │
                     ├──────────────────┤
                     │ • JS SDK         │
                     │ • C# SDK         │
+                    │ (stores API key) │
                     └──────────────────┘
                               │
+    2. POST /api/events       │
+       X-API-Key: ********    │
                               ↓
                     ┌──────────────────┐
                     │ Sysmoon Backend  │
                     ├──────────────────┤
-                    │ • API Gateway    │
+                    │ • Validate API Key│
                     │ • Event Processor│
-                    │ • Real-time Broker (WS/SignalR)
-                    │ • PostgreSQL DB  │
+                    │ • Save to DB     │
+                    │ • Broadcast WS   │
                     └──────────────────┘
                               │
+           3. Real-time       │
+              Broadcast       │
                               ↓
                     ┌──────────────────┐
                     │ Dashboard UI     │
-                    │ (receives events │
-                    │  via WebSocket)  │
+                    │ (WebSocket/SignalR) │
                     └──────────────────┘
 ```
+
+**Authentication Steps:**
+1. Demo app registers without auth → receives unique API key
+2. SDK stores API key internally
+3. All event requests include `X-API-Key` header
+4. Backend validates API key before accepting events
+5. Events saved to database AND broadcast to dashboard in real-time
+
+**Note**: The WebSocket/SignalR server is built into the Sysmoon backend (`server.ts`). No external streaming script is needed - events flow directly from the backend to the dashboard UI.
 
 ## Testing Checklist
 
