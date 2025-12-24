@@ -46,7 +46,7 @@ export class SysmoonClient {
       throw new Error(`Registration failed: ${response.statusText}`);
     }
 
-    const result = await response.json();
+    const result: any = await response.json();
     
     if (!result.success) {
       throw new Error(result.error || 'Registration failed');
@@ -79,7 +79,7 @@ export class SysmoonClient {
       throw new Error(`Failed to send event: ${response.statusText}`);
     }
 
-    const result = await response.json();
+    const result: any = await response.json();
     
     if (!result.success) {
       throw new Error(result.error || 'Failed to send event');
@@ -107,7 +107,7 @@ export class SysmoonClient {
       throw new Error(`Failed to send events: ${response.statusText}`);
     }
 
-    const result = await response.json();
+    const result: any = await response.json();
     
     if (!result.success) {
       throw new Error(result.error || 'Failed to send events');

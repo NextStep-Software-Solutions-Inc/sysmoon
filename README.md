@@ -60,6 +60,9 @@ sysmoon/
 ├── sdks/
 │   ├── js/                 # JavaScript/TypeScript SDK
 │   └── csharp/             # C#/.NET SDK
+├── demo-apps/              # Demo 3rd party applications
+│   ├── ecommerce-nodejs/   # E-commerce demo (Node.js)
+│   └── monitoring-csharp/  # Monitoring service (C#)
 ├── public/                 # Static assets
 ├── server.ts               # Custom server with WebSocket
 ├── next.config.js          # Next.js configuration
@@ -127,6 +130,37 @@ sysmoon/
    - Dashboard: http://localhost:3000/dashboard
    - API: http://localhost:3000/api/*
    - WebSocket: ws://localhost:3000/api/socket
+
+## 🎮 Demo Applications
+
+Sysmoon includes fully functional demo applications that showcase SDK integration in real-world scenarios:
+
+### E-Commerce Platform (Node.js)
+```bash
+cd demo-apps/ecommerce-nodejs
+pnpm install
+pnpm start
+```
+
+Features:
+- Order management with event tracking
+- Payment processing simulation
+- Real-time WebSocket streaming
+- Background activity simulation
+
+### System Monitoring Service (C#)
+```bash
+cd demo-apps/monitoring-csharp
+dotnet run
+```
+
+Features:
+- CPU, memory, disk, and network metrics
+- Batch event sending
+- SignalR real-time streaming
+- Anomaly detection
+
+See [`demo-apps/README.md`](./demo-apps/README.md) for detailed documentation.
 
 ## 📚 Usage
 
