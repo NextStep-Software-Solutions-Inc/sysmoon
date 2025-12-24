@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(
       createApiResponse(true, {
-        systems: systems.map(s => ({
+        systems: systems.map((s: any) => ({
           id: s.id,
           name: s.name,
           description: s.description,

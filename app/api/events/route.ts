@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
     
     if (isBatch) {
       const events = eventBatchSchema.parse(body);
-      const eventsWithSystemId = events.map(event => ({
+      const eventsWithSystemId = events.map((event: any) => ({
         ...event,
         systemId,
       }));
@@ -45,15 +45,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         createApiResponse(true, {
           count: processedEvents.length,
-          events: processedEvents.map(e => ({ id: e.id, timestamp: e.timestamp })),
+          events: processedEvents.map((e: any) => ({ id: e.id, timestamp: e.timestamp })),
         }),
         { status: 201 }
       );
     } else {
       const event = eventSchema.parse(body);
       const processedEvent = await eventProcessor.processEvent({
-        ...event,
         systemId,
+        eventType: event.eventType,
+        payload: event.payload,
+        severity: event.severity,
       });
 
       return NextResponse.json(

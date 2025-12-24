@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(
       createApiResponse(true, {
-        events: events.map(e => ({
+        events: events.map((e: any) => ({
           id: e.id,
           systemId: e.systemId,
           systemName: e.system.name,
