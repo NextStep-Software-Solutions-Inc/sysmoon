@@ -12,6 +12,7 @@
     "db:studio": "cd packages/database && pnpm prisma studio"
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "@microsoft/signalr": "^8.0.7",
     "@sysmoon/database": "workspace:*",
     "bcryptjs": "^2.4.3",
