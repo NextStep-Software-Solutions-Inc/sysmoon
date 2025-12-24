@@ -70,7 +70,7 @@ sysmoon/
 
 ### Prerequisites
 
-- Node.js 18+ and pnpm 8+
+- Node.js 20+ (LTS) and pnpm 9+
 - PostgreSQL 14+
 - .NET 8.0+ (for C# SDK development)
 
@@ -325,7 +325,7 @@ vercel deploy
 
 **Docker:**
 ```dockerfile
-FROM node:18-alpine
+FROM node:20-alpine
 WORKDIR /app
 COPY . .
 RUN npm install -g pnpm

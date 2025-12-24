@@ -5,10 +5,10 @@ Get Sysmoon up and running in 5 minutes!
 ## Prerequisites Check
 
 ```bash
-# Check Node.js version (need 18+)
+# Check Node.js version (need 20+ LTS)
 node --version
 
-# Check pnpm (need 8+)
+# Check pnpm (need 9+)
 pnpm --version
 
 # Check PostgreSQL (need 14+)

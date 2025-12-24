@@ -26,6 +26,9 @@
     "typescript": "^5.3.3",
     "eslint": "^8.56.0"
   },
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "keywords": ["monitoring", "real-time", "events", "sdk"],
   "author": "Sysmoon",
   "license": "MIT"

@@ -4,9 +4,9 @@ This guide covers deploying Sysmoon in various environments.
 
 ## Prerequisites
 
-- Node.js 18+
+- Node.js 20+ (LTS)
 - PostgreSQL 14+
-- pnpm 8+
+- pnpm 9+
 - (Optional) Docker & Docker Compose
 - (Optional) Kubernetes cluster
 
@@ -201,8 +201,8 @@ docker-compose up -d
 
 **apps/server-api/Dockerfile**:
 ```dockerfile
-FROM node:18-alpine AS base
-RUN npm install -g pnpm@8
+FROM node:20-alpine AS base
+RUN npm install -g pnpm@9
 
 FROM base AS deps
 WORKDIR /app
@@ -234,8 +234,8 @@ CMD ["pnpm", "--filter", "@sysmoon/server-api", "start"]
 
 **apps/dashboard/Dockerfile**:
 ```dockerfile
-FROM node:18-alpine AS base
-RUN npm install -g pnpm@8
+FROM node:20-alpine AS base
+RUN npm install -g pnpm@9
 
 FROM base AS deps
 WORKDIR /app
@@ -280,8 +280,8 @@ CMD ["pnpm", "--filter", "@sysmoon/dashboard", "start"]
 # Update system
 sudo apt update && sudo apt upgrade -y
 
-# Install Node.js
-curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+# Install Node.js 20 LTS
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt install -y nodejs
 
 # Install pnpm
