@@ -20,11 +20,27 @@ app.use(express.json());
 
 // Configuration
 const SYSMOON_API_URL = process.env.SYSMOON_API_URL || 'http://localhost:3000';
+const SYSMOON_API_KEY = process.env.SYSMOON_API_KEY;
 const PORT = process.env.PORT || 4000;
 
-// Initialize Sysmoon client
+// Validate required environment variables
+if (!SYSMOON_API_KEY) {
+  console.error('❌ Error: SYSMOON_API_KEY environment variable is required');
+  console.error('');
+  console.error('Please register your system in the Sysmoon dashboard:');
+  console.error(`  1. Navigate to ${SYSMOON_API_URL}/systems`);
+  console.error('  2. Click "Register New System"');
+  console.error('  3. Copy the generated API key');
+  console.error('  4. Set the environment variable:');
+  console.error('     export SYSMOON_API_KEY="your-api-key-here"');
+  console.error('');
+  process.exit(1);
+}
+
+// Initialize Sysmoon client with API key
 const sysmoon = new SysmoonClient({
   apiUrl: SYSMOON_API_URL,
+  apiKey: SYSMOON_API_KEY,
 });
 
 // Store for demo data
@@ -37,18 +53,9 @@ let orderCounter = 1;
 async function initializeMonitoring() {
   try {
     console.log('🚀 E-Commerce Demo App - Initializing...\n');
-    
-    // Register with Sysmoon
-    console.log('📝 Registering with Sysmoon monitoring...');
-    const registration = await sysmoon.register(
-      'Demo E-Commerce Platform',
-      'A demo e-commerce application showcasing Sysmoon monitoring capabilities'
-    );
-    
-    console.log('✅ Registration successful!');
-    console.log(`   System ID: ${registration.systemId}`);
-    console.log(`   API Key: ${registration.apiKey}`);
-    console.log(`   Note: API key is stored for this session\n`);
+    console.log(`📊 Connected to Sysmoon at ${SYSMOON_API_URL}`);
+    console.log(`🔑 Using API Key: ${SYSMOON_API_KEY.substring(0, 8)}...`);
+    console.log('');
     
     // Send startup event
     await sysmoon.sendEvent({
@@ -62,11 +69,12 @@ async function initializeMonitoring() {
       severity: 'info',
     });
     
-    console.log('✅ Startup event sent\n');
+    console.log('✅ Startup event sent successfully\n');
     
   } catch (error) {
     console.error('❌ Failed to initialize monitoring:', error.message);
-    console.error('   App will continue without monitoring...\n');
+    console.error('   Please check your API key and Sysmoon server status\n');
+    process.exit(1);
   }
 }
 
