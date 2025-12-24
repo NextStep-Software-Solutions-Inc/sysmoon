@@ -1,0 +1,56 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "demo-apps", "demo-apps", "{E6E41649-FDAC-BD04-56DE-992887A5B054}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{B36A84DF-456D-A817-6EDD-3EC3E7F6E11F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sdks", "sdks", "{665A7CC4-0863-C354-E4B4-45BC1E6FE98B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "monitoring-csharp", "monitoring-csharp", "{A15B9B29-8E23-CB83-84B6-DB737C2E449A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoMonitoringService", "demo-apps\monitoring-csharp\DemoMonitoringService.csproj", "{63B397BF-4833-BD2E-B4DA-3C4C9051A4CE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "csharp", "csharp", "{06E8C8A7-A0E8-98DE-8946-9CF52B15DA27}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SysmoonExamples", "examples\csharp\SysmoonExamples.csproj", "{0359F1FC-058F-EE7E-BC19-886282FF4CAE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "csharp", "csharp", "{0B9AF781-881A-9F0E-7B6B-ADD28547C3D0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sysmoon.SDK", "sdks\csharp\Sysmoon.SDK\Sysmoon.SDK.csproj", "{39078ED6-EE2A-20C4-8EA3-FD8A1B97DAB5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{63B397BF-4833-BD2E-B4DA-3C4C9051A4CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63B397BF-4833-BD2E-B4DA-3C4C9051A4CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63B397BF-4833-BD2E-B4DA-3C4C9051A4CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63B397BF-4833-BD2E-B4DA-3C4C9051A4CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0359F1FC-058F-EE7E-BC19-886282FF4CAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0359F1FC-058F-EE7E-BC19-886282FF4CAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0359F1FC-058F-EE7E-BC19-886282FF4CAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0359F1FC-058F-EE7E-BC19-886282FF4CAE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39078ED6-EE2A-20C4-8EA3-FD8A1B97DAB5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39078ED6-EE2A-20C4-8EA3-FD8A1B97DAB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39078ED6-EE2A-20C4-8EA3-FD8A1B97DAB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39078ED6-EE2A-20C4-8EA3-FD8A1B97DAB5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A15B9B29-8E23-CB83-84B6-DB737C2E449A} = {E6E41649-FDAC-BD04-56DE-992887A5B054}
+		{63B397BF-4833-BD2E-B4DA-3C4C9051A4CE} = {A15B9B29-8E23-CB83-84B6-DB737C2E449A}
+		{06E8C8A7-A0E8-98DE-8946-9CF52B15DA27} = {B36A84DF-456D-A817-6EDD-3EC3E7F6E11F}
+		{0359F1FC-058F-EE7E-BC19-886282FF4CAE} = {06E8C8A7-A0E8-98DE-8946-9CF52B15DA27}
+		{0B9AF781-881A-9F0E-7B6B-ADD28547C3D0} = {665A7CC4-0863-C354-E4B4-45BC1E6FE98B}
+		{39078ED6-EE2A-20C4-8EA3-FD8A1B97DAB5} = {0B9AF781-881A-9F0E-7B6B-ADD28547C3D0}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B22447C0-F58F-4650-BBF8-325FB085917E}
+	EndGlobalSection
+EndGlobal
