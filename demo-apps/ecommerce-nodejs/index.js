@@ -12,6 +12,7 @@
  * - Continuous monitoring
  */
 
+import 'dotenv/config';
 import express from 'express';
 import SysmoonClient from '@sysmoon/sdk-js';
 
@@ -21,7 +22,43 @@ app.use(express.json());
 // Configuration
 const SYSMOON_API_URL = process.env.SYSMOON_API_URL || 'http://localhost:3000';
 const SYSMOON_API_KEY = process.env.SYSMOON_API_KEY;
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 4001;
+
+// Event type and severity randomization
+const EVENT_TYPES = [
+  'app.started', 'app.shutdown', 'health.check', 'user.login', 'user.logout',
+  'user.browsing', 'user.search', 'user.cart.add', 'user.cart.remove',
+  'order.created', 'order.updated', 'order.cancelled', 'order.shipped',
+  'order.delivered', 'order.returned', 'payment.processed', 'payment.failed',
+  'payment.refunded', 'inventory.check', 'inventory.low', 'inventory.restocked',
+  'cache.hit', 'cache.miss', 'cache.expired', 'api.request', 'api.response',
+  'database.query', 'database.error', 'email.sent', 'email.failed',
+  'notification.sent', 'notification.failed', 'system.cpu.high', 'system.memory.high',
+  'system.disk.full', 'backup.started', 'backup.completed', 'backup.failed'
+];
+
+const SEVERITIES = ['info', 'warning', 'error', 'critical'];
+
+// Helper functions for randomization
+function getRandomEventType() {
+  return EVENT_TYPES[Math.floor(Math.random() * EVENT_TYPES.length)];
+}
+
+function getRandomSeverity() {
+  // Weighted distribution: more info/warning, fewer error/critical
+  const weights = [0.6, 0.25, 0.1, 0.05]; // info, warning, error, critical
+  const random = Math.random();
+  let cumulative = 0;
+  
+  for (let i = 0; i < weights.length; i++) {
+    cumulative += weights[i];
+    if (random <= cumulative) {
+      return SEVERITIES[i];
+    }
+  }
+  
+  return 'info'; // fallback
+}
 
 // Validate required environment variables
 if (!SYSMOON_API_KEY) {
@@ -85,13 +122,13 @@ async function initializeMonitoring() {
 // Health check endpoint
 app.get('/health', async (req, res) => {
   await sysmoon.sendEvent({
-    eventType: 'health.check',
+    eventType: getRandomEventType(),
     payload: {
       status: 'healthy',
       uptime: process.uptime(),
       memory: process.memoryUsage(),
     },
-    severity: 'info',
+    severity: getRandomSeverity(),
   });
   
   res.json({ status: 'healthy', uptime: process.uptime() });
@@ -105,12 +142,12 @@ app.post('/api/orders', async (req, res) => {
     // Validate request
     if (!items || !customerId || !total) {
       await sysmoon.sendEvent({
-        eventType: 'order.validation_failed',
+        eventType: getRandomEventType(),
         payload: {
           reason: 'Missing required fields',
           received: req.body,
         },
-        severity: 'warning',
+        severity: getRandomSeverity(),
       });
       
       return res.status(400).json({ error: 'Missing required fields' });
@@ -130,7 +167,7 @@ app.post('/api/orders', async (req, res) => {
     
     // Send order created event
     await sysmoon.sendEvent({
-      eventType: 'order.created',
+      eventType: getRandomEventType(),
       payload: {
         orderId: order.id,
         customerId: order.customerId,
@@ -138,7 +175,7 @@ app.post('/api/orders', async (req, res) => {
         total: order.total,
         timestamp: order.createdAt,
       },
-      severity: 'info',
+      severity: getRandomSeverity(),
     });
     
     console.log(`📦 Order #${order.id} created - Total: $${total}`);
@@ -146,12 +183,12 @@ app.post('/api/orders', async (req, res) => {
     res.status(201).json(order);
   } catch (error) {
     await sysmoon.sendEvent({
-      eventType: 'order.creation_failed',
+      eventType: getRandomEventType(),
       payload: {
         error: error.message,
         stack: error.stack,
       },
-      severity: 'error',
+      severity: getRandomSeverity(),
     });
     
     res.status(500).json({ error: 'Failed to create order' });
@@ -168,7 +205,7 @@ app.post('/api/payments', async (req, res) => {
     
     if (success) {
       await sysmoon.sendEvent({
-        eventType: 'payment.processed',
+        eventType: getRandomEventType(),
         payload: {
           orderId,
           amount,
@@ -176,7 +213,7 @@ app.post('/api/payments', async (req, res) => {
           transactionId: `txn_${Date.now()}`,
           timestamp: new Date().toISOString(),
         },
-        severity: 'info',
+        severity: getRandomSeverity(),
       });
       
       console.log(`💳 Payment processed - Order #${orderId}: $${amount}`);
@@ -184,7 +221,7 @@ app.post('/api/payments', async (req, res) => {
       res.json({ success: true, transactionId: `txn_${Date.now()}` });
     } else {
       await sysmoon.sendEvent({
-        eventType: 'payment.failed',
+        eventType: getRandomEventType(),
         payload: {
           orderId,
           amount,
@@ -192,7 +229,7 @@ app.post('/api/payments', async (req, res) => {
           reason: 'Payment gateway timeout',
           timestamp: new Date().toISOString(),
         },
-        severity: 'error',
+        severity: getRandomSeverity(),
       });
       
       console.log(`❌ Payment failed - Order #${orderId}`);
@@ -201,12 +238,12 @@ app.post('/api/payments', async (req, res) => {
     }
   } catch (error) {
     await sysmoon.sendEvent({
-      eventType: 'payment.error',
+      eventType: getRandomEventType(),
       payload: {
         error: error.message,
         stack: error.stack,
       },
-      severity: 'critical',
+      severity: getRandomSeverity(),
     });
     
     res.status(500).json({ error: 'Payment processing error' });
@@ -216,12 +253,12 @@ app.post('/api/payments', async (req, res) => {
 // Get orders endpoint
 app.get('/api/orders', async (req, res) => {
   await sysmoon.sendEvent({
-    eventType: 'orders.listed',
+    eventType: getRandomEventType(),
     payload: {
       count: orders.length,
       timestamp: new Date().toISOString(),
     },
-    severity: 'info',
+    severity: getRandomSeverity(),
   });
   
   res.json(orders);
@@ -231,31 +268,15 @@ app.get('/api/orders', async (req, res) => {
 function simulateActivity() {
   setInterval(async () => {
     // Randomly generate events
-    const eventTypes = [
-      {
-        type: 'user.browsing',
-        payload: { page: '/products', sessionId: `session_${Math.random()}` },
-        severity: 'info',
-      },
-      {
-        type: 'inventory.check',
-        payload: { itemsInStock: Math.floor(Math.random() * 1000) },
-        severity: 'info',
-      },
-      {
-        type: 'cache.hit',
-        payload: { key: 'product_list', hitRate: Math.random() },
-        severity: 'info',
-      },
-    ];
-    
-    const randomEvent = eventTypes[Math.floor(Math.random() * eventTypes.length)];
-    
     try {
       await sysmoon.sendEvent({
-        eventType: randomEvent.type,
-        payload: randomEvent.payload,
-        severity: randomEvent.severity,
+        eventType: getRandomEventType(),
+        payload: {
+          activity: 'background_process',
+          timestamp: new Date().toISOString(),
+          randomValue: Math.random(),
+        },
+        severity: getRandomSeverity(),
       });
     } catch (error) {
       // Silently fail for background events

@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@sysmoon/sdk-js": "workspace:*",
+    "dotenv": "^17.2.3",
     "express": "^4.18.2"
   },
   "engines": {

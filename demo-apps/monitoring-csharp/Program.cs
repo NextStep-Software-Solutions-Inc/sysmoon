@@ -23,6 +23,45 @@ class Program
     private static bool _isRunning = true;
     private static readonly Random _random = new Random();
 
+    // Event type and severity randomization
+    private static readonly string[] EVENT_TYPES = new[]
+    {
+        "monitoring.cpu", "monitoring.memory", "monitoring.disk", "monitoring.network",
+        "system.cpu.high", "system.memory.high", "system.disk.full", "system.network.congestion",
+        "performance.slow", "performance.fast", "cache.hit", "cache.miss", "cache.expired",
+        "database.query", "database.connection", "database.error", "api.request", "api.response",
+        "user.login", "user.logout", "user.session", "backup.started", "backup.completed",
+        "backup.failed", "notification.sent", "notification.failed", "email.sent", "email.failed",
+        "inventory.check", "inventory.low", "inventory.restocked", "order.created", "order.updated",
+        "order.cancelled", "payment.processed", "payment.failed", "payment.refunded"
+    };
+
+    private static readonly string[] SEVERITIES = new[] { "info", "warning", "error", "critical" };
+
+    private static string GetRandomEventType()
+    {
+        return EVENT_TYPES[_random.Next(EVENT_TYPES.Length)];
+    }
+
+    private static string GetRandomSeverity()
+    {
+        // Weighted distribution: more info/warning, fewer error/critical
+        var weights = new[] { 0.6, 0.25, 0.1, 0.05 }; // info, warning, error, critical
+        var random = _random.NextDouble();
+        var cumulative = 0.0;
+
+        for (var i = 0; i < weights.Length; i++)
+        {
+            cumulative += weights[i];
+            if (random <= cumulative)
+            {
+                return SEVERITIES[i];
+            }
+        }
+
+        return "info"; // fallback
+    }
+
     static async Task Main(string[] args)
     {
         Console.WriteLine("🔍 System Monitoring Service - Starting...\n");
@@ -128,20 +167,20 @@ class Program
                 // CPU monitoring
                 events.Add(new EventData
                 {
-                    EventType = "monitoring.cpu",
+                    EventType = GetRandomEventType(),
                     Payload = new
                     {
                         usage = cpuUsage,
                         cores = Environment.ProcessorCount,
                         threshold = 80.0
                     },
-                    Severity = cpuUsage > 80 ? "warning" : "info"
+                    Severity = GetRandomSeverity()
                 });
 
                 // Memory monitoring
                 events.Add(new EventData
                 {
-                    EventType = "monitoring.memory",
+                    EventType = GetRandomEventType(),
                     Payload = new
                     {
                         usagePercent = memoryUsage,
@@ -149,13 +188,13 @@ class Program
                         availableMB = (int)(16384 * (1 - memoryUsage / 100)),
                         threshold = 85.0
                     },
-                    Severity = memoryUsage > 85 ? "error" : memoryUsage > 75 ? "warning" : "info"
+                    Severity = GetRandomSeverity()
                 });
 
                 // Disk monitoring
                 events.Add(new EventData
                 {
-                    EventType = "monitoring.disk",
+                    EventType = GetRandomEventType(),
                     Payload = new
                     {
                         usagePercent = diskUsage,
@@ -163,13 +202,13 @@ class Program
                         freeGB = (int)(500 * (1 - diskUsage / 100)),
                         path = "C:\\"
                     },
-                    Severity = diskUsage > 90 ? "critical" : diskUsage > 80 ? "warning" : "info"
+                    Severity = GetRandomSeverity()
                 });
 
                 // Network monitoring
                 events.Add(new EventData
                 {
-                    EventType = "monitoring.network",
+                    EventType = GetRandomEventType(),
                     Payload = new
                     {
                         inboundMbps = networkTraffic.Inbound,
@@ -177,7 +216,7 @@ class Program
                         packetsReceived = _random.Next(1000, 10000),
                         packetsSent = _random.Next(1000, 10000)
                     },
-                    Severity = "info"
+                    Severity = GetRandomSeverity()
                 });
 
                 // Send batch events
@@ -205,29 +244,20 @@ class Program
 
     static async Task SimulateAnomalyEvent()
     {
-        var anomalies = new[]
-        {
-            new { type = "monitoring.anomaly.high_cpu", severity = "warning", message = "CPU usage spike detected" },
-            new { type = "monitoring.anomaly.memory_leak", severity = "error", message = "Potential memory leak detected" },
-            new { type = "monitoring.anomaly.disk_io", severity = "warning", message = "High disk I/O detected" },
-            new { type = "monitoring.anomaly.network_congestion", severity = "warning", message = "Network congestion detected" }
-        };
-
-        var anomaly = anomalies[_random.Next(anomalies.Length)];
-
         await _client!.SendEventAsync(new EventData
         {
-            EventType = anomaly.type,
+            EventType = GetRandomEventType(),
             Payload = new
             {
-                message = anomaly.message,
+                message = "Anomaly detected",
                 detectedAt = DateTime.UtcNow,
-                confidence = _random.Next(70, 100)
+                confidence = _random.Next(70, 100),
+                anomalyType = "random"
             },
-            Severity = anomaly.severity
+            Severity = GetRandomSeverity()
         });
 
-        Console.WriteLine($"   ⚠️  {anomaly.message}");
+        Console.WriteLine($"   ⚠️  Anomaly detected");
     }
 
     static double SimulateCpuUsage()

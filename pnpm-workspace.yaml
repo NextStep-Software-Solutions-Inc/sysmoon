@@ -1,5 +1,11 @@
 packages:
-  - 'packages/*'
-  - 'sdks/*'
-  - 'demo-apps/*'
+  - packages/*
+  - sdks/*
+  - demo-apps/*
 
+ignoredBuiltDependencies:
+  - '@prisma/engines'
+  - prisma
+
+onlyBuiltDependencies:
+  - bufferutil

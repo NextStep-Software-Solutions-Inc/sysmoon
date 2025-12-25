@@ -133,9 +133,10 @@ export default function SystemsManagement() {
                         {newSystem.apiKey}
                       </code>
                       <button
-                        onClick={() => copyToClipboard(newSystem.apiKey, newSystem.id)}
+                        onClick={() => newSystem.apiKey && copyToClipboard(newSystem.apiKey, newSystem.id)}
                         className="px-3 py-2 bg-white dark:bg-gray-800 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                         title="Copy API Key"
+                        disabled={!newSystem.apiKey}
                       >
                         {copiedKey === newSystem.id ? (
                           <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
