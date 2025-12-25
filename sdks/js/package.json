@@ -48,7 +48,12 @@
     "url": "https://github.com/NextStep-Software-Solutions-Inc/sysmoon/issues"
   },
   "homepage": "https://github.com/NextStep-Software-Solutions-Inc/sysmoon#readme",
-  "keywords": ["monitoring", "real-time", "events", "sdk"],
+  "keywords": [
+    "monitoring",
+    "real-time",
+    "events",
+    "sdk"
+  ],
   "author": "Sysmoon",
   "license": "MIT"
 }

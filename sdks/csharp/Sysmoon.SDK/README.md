@@ -31,5 +31,6 @@ await client.SendEventAsync(new SysmoonEvent
 For real-time streaming examples, see the project source and examples in `examples/csharp`.
 
 ## Links
-- Repo: https://github.com/NextStep-Software-Solutions-Inc/sysmoon
+
+- Repo: <https://github.com/NextStep-Software-Solutions-Inc/sysmoon>
 - License: MIT
