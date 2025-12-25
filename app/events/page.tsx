@@ -170,8 +170,8 @@ export default function EventsPage() {
               <button
                 onClick={() => setAutoScroll(!autoScroll)}
                 className={`w-full px-3 py-2 rounded-md transition-colors ${autoScroll
-                    ? 'bg-purple-600 text-white hover:bg-purple-700'
-                    : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                  ? 'bg-purple-600 text-white hover:bg-purple-700'
+                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
                   }`}
               >
                 {autoScroll ? 'Auto-Scroll: ON' : 'Auto-Scroll: OFF'}
