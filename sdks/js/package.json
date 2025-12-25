@@ -1,6 +1,6 @@
 {
   "name": "@sysmoon/sdk-js",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "JavaScript SDK for Sysmoon monitoring system",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -12,10 +12,17 @@
       "types": "./dist/index.d.ts"
     }
   },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts",
     "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "publish:npm": "npm publish --access public",
+    "publish:github": "npm publish --registry=https://npm.pkg.github.com"
   },
   "dependencies": {
     "socket.io-client": "^4.6.0"
@@ -29,6 +36,18 @@
   "engines": {
     "node": ">=20.0.0"
   },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NextStep-Software-Solutions-Inc/sysmoon.git",
+    "directory": "sdks/js"
+  },
+  "bugs": {
+    "url": "https://github.com/NextStep-Software-Solutions-Inc/sysmoon/issues"
+  },
+  "homepage": "https://github.com/NextStep-Software-Solutions-Inc/sysmoon#readme",
   "keywords": ["monitoring", "real-time", "events", "sdk"],
   "author": "Sysmoon",
   "license": "MIT"
