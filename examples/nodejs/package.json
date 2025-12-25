@@ -1,0 +1,13 @@
+{
+  "name": "sysmoon-nodejs-examples",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Node.js examples for Sysmoon SDK",
+  "scripts": {
+    "basic": "node basic-usage.js",
+    "realtime": "node realtime-streaming.js"
+  },
+  "dependencies": {
+    "@sysmoon/sdk-js": "workspace:*"
+  }
+}

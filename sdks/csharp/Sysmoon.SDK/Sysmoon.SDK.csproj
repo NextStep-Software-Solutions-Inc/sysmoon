@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors>NU1903</WarningsAsErrors>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>Sysmoon.SDK</PackageId>
+    <Version>1.0.1</Version>
+    <Authors>Sysmoon</Authors>
+    <Description>C# SDK for Sysmoon monitoring system</Description>
+    <PackageTags>monitoring;real-time;events;sdk</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/NextStep-Software-Solutions-Inc/sysmoon</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/NextStep-Software-Solutions-Inc/sysmoon</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="8.0.0" />
+    <PackageReference Include="System.Text.Json" Version="8.0.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+</Project>
